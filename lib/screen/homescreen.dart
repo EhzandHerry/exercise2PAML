@@ -1,53 +1,59 @@
-import 'package:exercise2/screen/detailscreen.dart';
-import 'package:exercise2/widget/footer_widget.dart';
-import 'package:exercise2/widget/form_widget.dart';
-import 'package:exercise2/widget/header_widget.dart';
+
+import 'package:exercise2/controller/kuliner_controller.dart';
+import 'package:exercise2/model/kuliner.dart';
+import 'package:exercise2/screen/formscreen.dart';
 import 'package:flutter/material.dart';
 
+class HomeView extends StatefulWidget {
+  const HomeView({super.key});
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-  
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  final KulinerController _controller = KulinerController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.getKuliner();
+  }
+
   @override
   Widget build(BuildContext context) {
-    var nama = TextEditingController();
-    var alamat = TextEditingController();
-    var notelp = TextEditingController();
-    var formKey = GlobalKey<FormState>();
-
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                HeaderWidget(),
-                FormWidget(
-                    formKey: formKey,
-                    etNama: nama,
-                    etAlamat: alamat,
-                    etNotelp: notelp),
-                FooterWidget(
-                  onPressedNext: () {
-                    if (formKey.currentState!.validate()) {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailScreen(
-                             
-                            ),
-                          ),
-                          (route) => false);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Data diproses")));
-                    }
-                  },
-                )
-              ],
-            ),
-          ),
-        ),
+      appBar: AppBar(
+        title: Text('Daftar Wisata Kuliner'),
+      ),
+      body: FutureBuilder<List<Kuliner>>(
+        future: _controller.getKuliner(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else {
+            return ListView.builder(
+              itemCount: snapshot.data?.length ?? 0,
+              itemBuilder: (context, index) {
+                Kuliner wisata = snapshot.data![index];
+                return ListTile(
+                  title: Text(wisata.nama_wisata),
+                );
+              },
+            );
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const FormScreen()),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:exercise2/screen/formscreen.dart';
 import 'package:exercise2/screen/homescreen.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +23,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
       //pindah ke halaman home
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) {
-          return HomeScreen();
+          return HomeView();
         })
       );
     });
